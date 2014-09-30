@@ -29,3 +29,14 @@ setTimeout(function() {
 }, 1600)
 
 ```
+
+Outputs finally:
+
+```
+$ node example.js
+toper
+also middle
+look, another middle
+bottom
+```
+
