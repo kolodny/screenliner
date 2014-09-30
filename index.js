@@ -3,43 +3,61 @@ function Screenliner(stream) {
   this.stream = stream;
   this.regions = [];
   this.lines = [];
-  this.metrics = stream.getWindowSize();
+  var metrics = stream.getWindowSize();
+  this.width = metrics[0];
+  this.height = metrics[1];
 }
 
-Screenliner.prototype.registerRegion = function(width, height) {
+Screenliner.prototype.createRegion = function(width, height, str) {
+  var self = this;
+  if (typeof width === 'string') {
+    str = width;
+    width = 1;
+    height = 1;
+  }
   height = height || 1;
+  var top = self.lines.length
   var region = {
     height: height,
-    top: this.lines.length
+    top: self.lines.length
   };
   for (var i = 0; i < height; i++) {
-    this.stream.write('\n');
-    this.lines.push('');
+    self.stream.write('\n');
+    self.lines.push('');
   }
-  return this.regions.push(region) - 1;
-};
+  
+  var region = {
+    print: function(text, xStart, yStart, keepLine) {
+      yStart = yStart || 0;
+      var appendToLine;
+      var lineNumber = top + yStart;
 
-Screenliner.prototype.printRegion = function(regionId, text, xStart, yStart) {
-  var region = this.regions[regionId];
-  yStart = yStart || 0;
-  var lineNumber = region.top + yStart;
-  var keepLine;
+      if (xStart === true) {
+        appendToLine = true;
+        xStart = self.lines[lineNumber].length;
+      } else {
+        xStart = xStart || 0;
+      }
+      self.stream.moveCursor(xStart, (top - self.lines.length) + yStart);
+      if (!keepLine && !appendToLine) {
+        self.stream.clearLine(1);
+      }
+      self.stream.write(text);
+      self.lines[lineNumber] = self.lines[lineNumber].slice(0, xStart) + text;
+      self.stream.moveCursor(0, (self.lines.length - top) - yStart);
+      self.stream.cursorTo(0);
+    }
+  };
 
-  if (xStart === true) {
-    keepLine = true;
-    xStart = this.lines[lineNumber].length;
-  } else {
-    xStart = xStart || 0;
+  var regionId = self.regions.push(region) - 1;
+  region.id = regionId;
+
+  if (str) {
+    region.print(str);
   }
 
-  this.stream.cursorTo(0);
-  this.stream.moveCursor(xStart, (region.top - this.lines.length) + yStart);
-  if (!keepLine) {
-    this.stream.clearLine(1);
-  }
-  this.stream.write(text);
-  this.lines[lineNumber] = this.lines[lineNumber].slice(0, xStart) + text;
-  this.stream.moveCursor(0, (this.lines.length - region.top) - yStart);
-};
+  return region
+}
+
 
 module.exports = Screenliner;

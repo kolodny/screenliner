@@ -1,6 +1,6 @@
 {
   "name": "screenliner",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "node util for writing to regions on the terminal",
   "main": "index.js",
   "scripts": {

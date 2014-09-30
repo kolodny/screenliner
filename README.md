@@ -6,37 +6,52 @@ Screenliner
 ```js
 var Screenliner = require('screenliner');
 var screenliner = new Screenliner();
+var Promise = require('bluebird');
 
-var top = screenliner.registerRegion(80);
-var middle = screenliner.registerRegion(80, 2);
-var bottom = screenliner.registerRegion(80, 3);
+var repeat = function(str, times) {
+  return new Array(times + 1).join(str);
+};
 
-screenliner.printRegion(top, 'top region');
+var lineStr = new Array(screenliner.width + 1).join('-');
 
-setTimeout(function() {
-  screenliner.printRegion(top, 'er', 3);
-}, 400)
+screenliner.createRegion(lineStr);
+var top = screenliner.createRegion();
+screenliner.createRegion(lineStr);
+var middle = screenliner.createRegion()
+screenliner.createRegion(lineStr);
+var bottom = screenliner.createRegion();
+screenliner.createRegion(lineStr);
 
-setTimeout(function() {
-  screenliner.printRegion(middle, 'middle');
-}, 800)
-setTimeout(function() {
-  screenliner.printRegion(bottom, 'bottom');
-}, 1200)
-setTimeout(function() {
-  screenliner.printRegion(middle, 'also middle')
-  screenliner.printRegion(middle, 'look, another middle', null, 1); // middle is two lines
-}, 1600)
+var sleep = function(ms) {
+	return new Promise(function(res) { setTimeout(res, ms); });
+}
 
+sleep(1000).then(function() {
+	top.print('This is top');
+	return sleep(1000)
+}).then(function() {
+	middle.print('This is middle');
+	return sleep(500)
+}).then(function() {
+	bottom.print('This is bottom');
+	return sleep(500)
+})
+
+.then(function() {
+	// done!
+})
 ```
 
 Outputs finally:
 
 ```
 $ node example.js
-toper
-also middle
-look, another middle
-bottom
+--------------------------------------------------------------------------------
+This is top
+--------------------------------------------------------------------------------
+This is middle
+--------------------------------------------------------------------------------
+This is bottom
+--------------------------------------------------------------------------------
 ```
 
