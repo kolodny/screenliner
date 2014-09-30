@@ -1,0 +1,27 @@
+{
+  "name": "screenliner",
+  "version": "0.0.0",
+  "description": "node util for writing to regions on the terminal",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "stream",
+    "cli",
+    "clearLine",
+    "moveCursor",
+    "cursorTo",
+    "stdout"
+  ],
+  "author": "Moshe Kolodny",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/kolodny/screenliner.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kolodny/screenliner/issues"
+  },
+  "homepage": "https://github.com/kolodny/screenliner"
+}
