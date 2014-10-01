@@ -11,10 +11,6 @@ var screenliner = new Screenliner();
 var Promise = require('bluebird');
 var fs = require('fs');
 
-var repeat = function(str, times) {
-  return new Array(times + 1).join(str);
-};
-
 var lineStr = new Array(screenliner.width + 1).join('-');
 
 screenliner.createRegion(lineStr);
