@@ -3,10 +3,13 @@ Screenliner
 
 ### example usage:
 
+test.js:
+
 ```js
-var Screenliner = require('screenliner');
+var Screenliner = require('./');
 var screenliner = new Screenliner();
 var Promise = require('bluebird');
+var fs = require('fs');
 
 var repeat = function(str, times) {
   return new Array(times + 1).join(str);
@@ -18,40 +21,44 @@ screenliner.createRegion(lineStr);
 var top = screenliner.createRegion();
 screenliner.createRegion(lineStr);
 var middle = screenliner.createRegion()
+var middle2 = screenliner.createRegion()
 screenliner.createRegion(lineStr);
 var bottom = screenliner.createRegion();
 screenliner.createRegion(lineStr);
 
 var sleep = function(ms) {
-	return new Promise(function(res) { setTimeout(res, ms); });
+  return new Promise(function(res) { setTimeout(res, ms); });
 }
 
-sleep(1000).then(function() {
-	top.print('This is top');
-	return sleep(1000)
+top.print('This is top - pending');
+middle.print('This is middle - pending');
+middle2.print('This is middle2 - status - ');
+bottom.print('This is bottom - pending');
+
+var timers = [];
+timers.push(sleep(Math.random() * 3000).then(function() {
+  top.replace('pending', '√');
+}));
+
+timers.push(sleep(Math.random() * 3000).then(function() {
+  middle.replace(/pending/, '√');
+}))
+timers.push(sleep(Math.random() * 3000).then(function() {
+  middle2.print('√', true); // appends
+}))
+
+timers.push(sleep(Math.random() * 3000).then(function() {
+  bottom.print('√'); // replaces
+}));
+
+Promise.all(timers).then(function() {
+  return sleep(500);
 }).then(function() {
-	middle.print('This is middle');
-	return sleep(500)
-}).then(function() {
-	bottom.print('This is bottom');
-	return sleep(500)
-})
-
-.then(function() {
-	// done!
-})
-```
-
-Outputs finally:
+  fs.writeFileSync('screen.txt', screenliner.getScreenState().join('\n'));
+  console.log('done!');
+});
 
 ```
-$ node example.js
---------------------------------------------------------------------------------
-This is top
---------------------------------------------------------------------------------
-This is middle
---------------------------------------------------------------------------------
-This is bottom
---------------------------------------------------------------------------------
-```
 
+Produces:
+![demo](demo.gif)

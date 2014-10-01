@@ -6,7 +6,11 @@ function Screenliner(stream) {
   var metrics = stream.getWindowSize();
   this.width = metrics[0];
   this.height = metrics[1];
-}
+};
+
+Screenliner.prototype.getScreenState = function() {
+  return this.lines.slice();
+};
 
 Screenliner.prototype.createRegion = function(width, height, str) {
   var self = this;
@@ -42,10 +46,18 @@ Screenliner.prototype.createRegion = function(width, height, str) {
       if (!keepLine && !appendToLine) {
         self.stream.clearLine(1);
       }
+      if (typeof text === 'function') {
+        text = text(self.lines[lineNumber]);
+      }
       self.stream.write(text);
       self.lines[lineNumber] = self.lines[lineNumber].slice(0, xStart) + text;
       self.stream.moveCursor(0, (self.lines.length - top) - yStart);
       self.stream.cursorTo(0);
+    },
+    replace: function(find, replace, xStart, yStart, keepLine) {
+      return region.print(function(currentLine) {
+        return currentLine.replace(find, replace);
+      }, xStart, yStart, keepLine);
     }
   };
 
